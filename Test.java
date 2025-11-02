@@ -13,13 +13,19 @@ import java.util.*;
  Module config: Species -> parameter holder baut PlantSpecies.
  Module Test: baut 3 Gruppen (je 10 Arten), fährt 10 runs pro Gruppe (25 Jahre), danach 1 run mit yearly summary + (year 1) daily trace.
 
- Arbeitsaufteilung Aufgabe 2:
+ NOTE: Aufgabenverteilung Aufgabe 2:
  1. Moustafa Nassli: Wettermodell (cloud/rain/soil)
  2. Valentin Kreuzer: Reproduktion der Pflanzen (Ein-/Mehrjährig) und DayLength Berechnung nach Standort
+
+ NOTE: Aufgabenverteilung Aufgabe 3 (Zusicherungen/Funktional/Parallel):
+ - Moustafa Nassli: Zusicherungen & Analyse, Parallel Runner
+ - Valentin Kreuzer: Funktionaler Analyseblock & Vertragskommentare im OO-Code
+ - Pair Session: Prüfen von Subtyping-Verträgen und Dokumentieren von GOOD/BAD Stellen
  */
 
 public class Test {
 
+    // STYLE: prozedurale Fabrik, erzeugt Parameterarrays ohne Seiteneffekte.
     static Species[] build(int y0) {
         Species[] g = new Species[10];
         for (int i = 0; i < g.length; i++) {
@@ -29,6 +35,8 @@ public class Test {
         return g;
     }
 
+    // STYLE: prozedurale Hilfsmethode für Listenaufbau.
+    // GOOD: Reine Transformation von Species[] -> List ohne Nebeneffekte vereinfacht Tests.
     static List<PlantSpecies> list(Species[] defs) {
         ArrayList<PlantSpecies> L = new ArrayList<>(defs.length);
         for (Species s : defs) L.add(s.toSpecies());
@@ -36,6 +44,8 @@ public class Test {
     }
 
     // 10 Läufe einer Gruppe mit Reports fahren.
+    // BAD: Hohe Kopplung zu Reporter/Simulation; schwer, alternative Ausgabeformen zu testen.
+    // STYLE: prozedurale Steuerung des Simulationsablaufs.
     static void runGroup(int groupIndex, Species[] defs, int seedBase, DayLengthModel dayLength, double lat, int dayStart) {
         Reporter.printGroupParams(groupIndex, Arrays.asList(defs));
         for (int run = 1; run <= 10; run++) {
@@ -59,6 +69,8 @@ public class Test {
         };
     }
 
+    // STYLE: prozedurale Datenaufbereitung mit polymorphen Strategien.
+    // GOOD: Zentrale Stelle, die Reproduction-Strategie auswählt → geringe Streuung der Logik.
     static List<PlantSpecies> listWithReproduction(Species[] defs, int groupIndex) {
         ArrayList<PlantSpecies> L = new ArrayList<>(defs.length);
         for (int i = 0; i < defs.length; i++) {
@@ -71,6 +83,8 @@ public class Test {
     }
 
     // ein Lauf mit Jahres Trace und (für Jahr 1) Tages Trace.
+    // STYLE: prozedurale Trace-Routine mit viel I/O.
+    // BAD: Methodenumfang groß, mischt Formatierung und Simulation; extrahierte Formatter wären wartbarer.
     static void yearlyAndDailyTrace(Species[] defs, long seed, DayLengthModel dayLength, double lat, int dayStart) {
         Weather weather = new Weather(seed, dayLength, lat, dayStart);
         BeePopulation bees = new BeePopulation(120);
@@ -138,5 +152,11 @@ public class Test {
         runGroup(2, g2, 1, dayLengthA, 48.2, 91);
         runGroup(3, g3, 1, dayLengthA, 48.2, 91);
         yearlyAndDailyTrace(g1, 2, dayLengthA, 48.2, 91);
+
+        FunctionalAnalysis.runFunctionalReport("Baseline Group 1", g1);
+        FunctionalAnalysis.runFunctionalReport("Baseline Group 2", g2);
+        FunctionalAnalysis.runFunctionalReport("Baseline Group 3", g3);
+
+        ParallelSimulationRunner.runParallelScenarios("Seed stress scenarios", g1, dayLengthA, 48.2, 91);
     }
 }

@@ -1,6 +1,9 @@
 import java.util.Random;
 
 // PerennialReproduction.java
+// STYLE: OO Strategie-Objekt (Reproduction) für mehrjährige Pflanzen.
+// CONTRACT (Class invariants): flowers, pollinated, fruits, seeds >= 0.
+// HISTORY: Zustände werden nur in start/end zurückgesetzt.
 
 // Mehrjährige Pflanzen - weniger Sameproduktion, speichert Samen
 public class PerennialReproduction implements Reproduction {
@@ -11,6 +14,7 @@ public class PerennialReproduction implements Reproduction {
     private int seeds;
 
     @Override
+    // CONTRACT: Preconditions: plant, weather, bees != null; food >= 0. Postconditions: counters bleiben >= 0.
     public void updateDaily(PlantSpecies plant, DayWeather weather, Pollinator bees, double food) {
         double b = plant.bloomFraction();
         if (b <= 0) return;
@@ -38,6 +42,7 @@ public class PerennialReproduction implements Reproduction {
     }
 
     @Override
+    // CONTRACT: Preconditions: plant, seeds, rng != null. Postconditions: counters reset, vigor bleibt bestehen.
     public void endOfSeason(PlantSpecies plant, SeedBank seeds, Random rng) {
         // Qualität aus Wetter und Bees berechnen
         double q = Math.min(1,0.6+0.4*plant.seedSet());
@@ -47,6 +52,7 @@ public class PerennialReproduction implements Reproduction {
     }
 
     @Override
+    // CONTRACT: Preconditions: plant, seeds, rng != null. Postconditions: counters reset; vigor erhöht sich leicht.
     public void startOfSeason(PlantSpecies plant, SeedBank seeds, Random rng) {
         this.flowers = this.pollinated = this.fruits = this.seeds = 0;
         // geringe Keimung

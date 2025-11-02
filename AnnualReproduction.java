@@ -1,6 +1,9 @@
 import java.util.Random;
 
 // AnnualReproduction.java
+// STYLE: OO Strategie-Objekt (Reproduction) für einjährige Pflanzen.
+// CONTRACT (Class invariants): flowers, pollinated, fruits, seeds >= 0 nach jeder Operation.
+// HISTORY: Zähler steigen während der Saison monoton und werden nur in start/end zurückgesetzt.
 
 // Einjährige Pflanzen - bilden Samen, reifen ab, sterben (vigor=0), Nachwuchs aus der Seedbank
 public class AnnualReproduction implements Reproduction {
@@ -11,6 +14,8 @@ public class AnnualReproduction implements Reproduction {
     private int seeds;
 
     @Override
+    // CONTRACT: Preconditions: plant, weather, bees != null; food >= 0. Postconditions: Invarianten bleiben erhalten.
+    // GOOD: Polymorphie ermöglicht austauschbare Reproduktionsstrategien über Reproduction-Interface.
     public void updateDaily(PlantSpecies plant, DayWeather weather, Pollinator bees, double food) {
         double b = plant.bloomFraction();
         if (b <= 0) return;
@@ -38,6 +43,8 @@ public class AnnualReproduction implements Reproduction {
     }
 
     @Override
+    // CONTRACT: Preconditions: plant, seeds, rng != null. Postconditions: counters reset, vigor = 0.
+    // BAD: Direkter Zugriff auf PlantSpecies-Setter koppelt eng an konkrete Mutatoren; Events/Observer wären flexibler.
     public void endOfSeason(PlantSpecies plant, SeedBank seeds, Random rng) {
         // Qualität aus Wetter und Bees berechnen
         double q = Math.min(1,0.5+0.5*plant.seedSet());
@@ -48,6 +55,7 @@ public class AnnualReproduction implements Reproduction {
     }
 
     @Override
+    // CONTRACT: Preconditions: plant, seeds, rng != null. Postconditions: counters reset, vigor erhöht um keimende Saat.
     public void startOfSeason(PlantSpecies plant, SeedBank seeds, Random rng) {
         this.flowers = this.pollinated = this.fruits = this.seeds = 0;
         int germ = seeds.germinate(rng);

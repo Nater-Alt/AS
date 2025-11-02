@@ -5,7 +5,10 @@ import java.util.Random;
 /*
   Teil vom module environment. Erzeugt daily weather (clouds, rain, evaporation)
   und die day length 8h -> 16h -> 8h. Hält day, cumulative sun, soil moisture, clouds.
-  STYLE: OO-Entität
+  STYLE: OO-Entität.
+
+  CONTRACT (Invarianten): 0 ≤ soilMoisture ≤ 1, 0 ≤ cloud ≤ 1, day in [0,SEASON_DAYS], cumSunHours ≥ 0.
+  HISTORY: cumSunHours wächst monoton, dayOfYear wandert zyklisch durch 1..365.
 */
 public class Weather implements Seasonal {
     private static final int SEASON_DAYS = 240;
@@ -27,6 +30,8 @@ public class Weather implements Seasonal {
     private int dayOfYear;
 
     // RNG setzen
+    // CONTRACT: Preconditions: dayLength != null. Postconditions: rng initialisiert, dayOfYearStart gesetzt.
+    // GOOD: Strategy über DayLengthModel erlaubt alternative Tageslängenmodelle.
     public Weather(long seed, DayLengthModel dayLength, double latitude, int dayOfYearStart) {
         this.rng = new Random(seed);
         this.dayLength = dayLength;
@@ -37,6 +42,7 @@ public class Weather implements Seasonal {
 
     // Saisonstartwerte setzen.
     @Override
+    // CONTRACT: Postcondition: day==0, cumSunHours==0, Zufallswerte initialisiert, dayOfYear = start.
     public void startSeason() {
         day = 0;
         cumSunHours = 0.0;
@@ -46,6 +52,9 @@ public class Weather implements Seasonal {
     }
 
     // einen Tag fortschreiben und Snapshot liefern.
+    // CONTRACT: Preconditions: startSeason() wurde zuvor aufgerufen. Postconditions: day erhöht sich max. bis SEASON_DAYS.
+    // GOOD: Berechnung isoliert Wettereffekte in einer Methode mit klaren Zwischenschritten.
+    // BAD: clamp-Funktion deckt MIN_DAYLEN/MAX_DAYLEN nicht; dayLengthTriangle ungenutzt -> toter Code.
     public DayWeather nextDay() {
         day++;
         if (day > SEASON_DAYS) day = SEASON_DAYS;
@@ -79,6 +88,7 @@ public class Weather implements Seasonal {
     }
 
     // RNG freigeben (Winter nutzt denselben Zufall).
+    // CONTRACT: Postcondition: Gibt RNG-Referenz zurück; Clients dürfen keine destruktiven Seeds setzen.
     public Random random() {
         return rng;
     }

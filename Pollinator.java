@@ -5,5 +5,6 @@
 */
 public interface Pollinator {
     // aktuelle Populationsgröße
+    // CONTRACT: Postcondition: Wert >= 0.
     double population();
 }

@@ -1,11 +1,13 @@
 // TriangleDayLength.java
-
+// STYLE: funktionale Approximation über Dreiecksfunktion.
+// CONTRACT: Ergebnis in [minH,maxH], Parameter minH <= maxH.
 
 // berechnet die Tageslänge anhand eines Dreicksmusters
 public class TriangleDayLength implements DayLengthModel {
     private final int seasonDay;
     private final double minH, maxH;
 
+    // CONTRACT: Preconditions: seasonDay > 0, minH <= maxH. Postconditions: Felder fixiert.
     public TriangleDayLength(int seasonDay, double minH, double maxH) {
         this.seasonDay = seasonDay;
         this.minH = minH;
@@ -14,6 +16,7 @@ public class TriangleDayLength implements DayLengthModel {
 
     // Entscheidungsbaum, je nach Standort und Tag des Jahres nach Dreiecksmuster
     @Override
+    // CONTRACT: Preconditions: dayOfYear >=1. Postcondition: Rückgabe in [minH,maxH].
     public double lightHours(int dayOfYear, double latitudeDegree) {
         int d = ((dayOfYear - 1) % seasonDay) + 1;
         int mid = seasonDay / 2;
