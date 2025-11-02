@@ -1,12 +1,16 @@
 import java.util.Random;
 
 // SeedBank.java
+// STYLE: OO Aggregat, kapselt Samenlager.
+// CONTRACT (Invariante): stored >= 0, 0 ≤ qualityAvg ≤ 1 sofern stored > 0.
+// HISTORY: stored reduziert/grows nur über add/germinate.
 
 public final class SeedBank {
     private int stored;
     private double qualityAvg;
 
     // Füge einen Output zu der bestehenden Seed Bank hinzu
+    // CONTRACT: Preconditions: output != null. Postconditions: stored >= vorher, qualityAvg gewichtet aktualisiert.
     public void add(SeedOutput output) {
         if(output.count <= 0) return;
 
@@ -16,6 +20,7 @@ public final class SeedBank {
     }
 
     // Berechnet die Keimung der Seeds in der SeedBank
+    // CONTRACT: Preconditions: rng != null. Postconditions: Rückgabewert >=0, stored reduziert sich.
     public int germinate(Random rng) {
         if (stored == 0) return 0;
 
@@ -27,6 +32,7 @@ public final class SeedBank {
         return Math.max(0, germinating);
     }
 
+    // CONTRACT: Postcondition: Rückgabe in [0,1].
     public double getQualityAvg() {
         return qualityAvg;
     }

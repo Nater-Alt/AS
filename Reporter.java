@@ -4,7 +4,9 @@ import java.util.List;
 
 /*
   Teil vom module I/O. Bündelt console output und Formatierung
-  STYLE: prozedurale utility mit static methods
+  STYLE: prozedurale Utility mit statischen Methoden.
+
+  CONTRACT: Methoden erwarten nicht-null Parameter und schreiben nur auf System.out.
 */
 public final class Reporter {
     public static void printRunHeader(int groupIndex, int runIndex, long seed) {
@@ -12,6 +14,7 @@ public final class Reporter {
     }
 
     // Endzusammenfassung pro Lauf.
+    // CONTRACT: Preconditions: bees != null, spp != null. Postconditions: Keine Änderungen am Modell, nur Ausgabe.
     public static void printFinalSummary(BeePopulation bees, List<PlantSpecies> spp) {
         System.out.printf("Bees population = %.2f%n", bees.population());
         for (int i = 0; i < spp.size(); i++) {
@@ -20,6 +23,7 @@ public final class Reporter {
     }
 
     // Parameter Tabelle einer Gruppe.
+    // CONTRACT: Preconditions: defs != null. Postconditions: Nur Ausgabe.
     public static void printGroupParams(int groupIndex, List<Species> defs) {
         System.out.printf("%n GROUP %d PARAMETERS %n", groupIndex);
         System.out.println("idx  y0   cMin  cMax  fMin  fMax  hStart  hEnd   q      p");

@@ -6,7 +6,10 @@ import java.util.Random;
 /*
   Teil vom module simulation. Kapselt einen multi year run
   (ecosystem + bees + weather).
-  STYLE: OO Wrapper. run() ist ein prozeduraler Loop.
+  STYLE: OO Wrapper mit prozeduralem Run-Loop.
+
+  CONTRACT: ecosystem, bees, weather, random bleiben != null.
+  HISTORY: run() iteriert deterministisch über Jahre und Tage.
 */
 public final class Simulation {
     private final Ecosystem ecosystem;
@@ -17,6 +20,7 @@ public final class Simulation {
     private static final int DAYS = 240; // Vegetationsperiode
 
 
+    // CONTRACT: Preconditions: group != null, weather != null, years > 0. Postconditions: Invarianten gesetzt.
     public Simulation(List<PlantSpecies> group, Weather weather, long randomSeed, double initialBeePopulation, int years) {
         this.ecosystem = new Ecosystem(group);
         this.weather = weather;
@@ -26,6 +30,9 @@ public final class Simulation {
     }
 
     // vollen Lauf durchführen: alle Tage, dann Winter.
+    // CONTRACT: Preconditions: none beyond Konstruktor. Postconditions: Nach Jahren sind alle Saisons abgeschlossen.
+    // GOOD: Klar strukturierter Doppelloop, der Jahresrhythmus eindeutig dokumentiert.
+    // BAD: Simulation erzeugt BeePopulation intern → erschwert Dependency Injection für Tests.
     public void run() {
         for (int year = 1; year <= years; year++) {
             ecosystem.resetSeason(random);
@@ -40,6 +47,7 @@ public final class Simulation {
     }
 
     // Read-only-Getter.
+    // CONTRACT: Postcondition: Liefert dieselbe Instanz, Client darf Zustand lesen.
     public BeePopulation bees() {
         return bees;
     }

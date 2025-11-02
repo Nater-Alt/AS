@@ -1,9 +1,12 @@
 // AstroDayLength.java
+// STYLE: funktionale Berechnung ohne Seiteneffekte.
+// CONTRACT: Liefert Werte in [0,24] für jeden TagOfYear (1..366).
 
 public class AstroDayLength implements DayLengthModel {
 
     // Berechnung anhand der Sonnendeklinationsformel
     @Override
+    // CONTRACT: Preconditions: dayOfYear beliebig (wird geclamped), latitudeDegree ∈ [-90,90] sinnvoll. Postcondition: Ergebnis in [0,24].
     public double lightHours(int dayOfYear, double latitudeDegree) {
         if (dayOfYear < 1 || dayOfYear > 366) dayOfYear = 1;
         if (Double.isNaN(latitudeDegree)) latitudeDegree = 0.0;
